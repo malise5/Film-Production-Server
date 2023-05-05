@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response, jsonify
 from flask_migrate import Migrate
 
 from model import db, Production
@@ -20,9 +20,35 @@ db.init_app(app)
 # rOUTES
 
 
+@app.before_request
+def test():
+    print("Here we go Again")
+
+
 @app.route("/")
 def index():
     return "Hey hallo"
+
+
+@app.route("/productions/<string:title>")
+def productions(title):
+    production = Production.query.filter(Production.title == title).first()
+    production_response = {
+        "title": production.title,
+        "genre": production.genre,
+        "director": production.director,
+        "budget": production.budget,
+        "description": production.description,
+        "image": production.image,
+        "ongoing": production.ongoing,
+
+    }
+
+    response = make_response(
+        jsonify(production_response), 200
+    )
+
+    return response
 
 
 # if __name__ == '__main__':
